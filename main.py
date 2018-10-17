@@ -1,6 +1,8 @@
-def function1()
-    open(Dic,r)
-    Dic.readlines()
-    x = Dic[0]
-    Dic.close()
-    return print('Word:',x)
+def function1():
+    path = 'Dic.txt'
+    dic = open(path,'r')
+    list_dic = dic.readlines()
+    s = input().lower()
+    dic.close()
+
+function1()
