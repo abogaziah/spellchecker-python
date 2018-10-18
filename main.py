@@ -5,14 +5,17 @@ text_file= open("Dic.txt","r" )
 dict = text_file.read().splitlines()
 text_file.close()
 
-                                                    # get input and save it in lowercase.
+                                                    # get input and save it list of words.
 phrase=input("type a phrase")
 words=phrase.split()
-for word in words:
-    word=word.lower()
 
-                                                   # find input in dictionary list the list, using binary search.
-    def find(dict, word):
+count=0                                             #counter for iterations
+
+
+for word in words:                                  #loop over phrase words
+    word=word.lower()                               #check for being lowecase to have identical ASCII code
+
+    def find(dict, word):                           #find input in dictionary , using binary search.
         l = 0
         r = len(dict) - 1
         while r>=l:
@@ -27,23 +30,28 @@ for word in words:
 
         return False
 
-    print(word, find(dict,word))
 
-    def action():
-        if find(dict,word)== False:
-            replace= difflib.get_close_matches(word,dict,3)
-            choice=0
-            while True:
-                print("did you mean:")
-                print(1,replace[0])
-                print(2,replace[1])
-                print(3, replace[2])
-                print(4, "ignor")
-                choice=int(input())
-                if choice==1 or choice==2 or choice==2 or choice==3 or choice==4 :
-                    break
-            if choice!=4:
-             print(replace[choice-1])
-            else:
-                print(word)
-    action()
+
+
+    if find(dict,word)== False:                        #taking actions in case it wasn't found
+        print(word, "is wrong")
+
+        replace= difflib.get_close_matches(word,dict,3)         #genrates a 3 elemnts list with best mathces
+        choice=0
+        while True:                                             #make user choose what he ment or skip
+            print("did you mean:")
+            print(1,replace[0])
+            print(2,replace[1])
+            print(3,replace[2])
+            print(4,"ignor")
+            choice=int(input())
+            if choice==1 or choice==2 or choice==2 or choice==3 or choice==4 :
+                break
+        if choice!=4:
+           words[count]=replace[choice-1]
+    count+=1
+
+
+
+for word in words:                                              #print out the new phrase
+    print(word, end=" ")
