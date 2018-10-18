@@ -30,10 +30,7 @@ for word in words:                                  #loop over phrase words
 
         return False
 
-
-
-
-    if find(dict,word)== False:                        #taking actions in case it wasn't found
+    if find(dict,word)== False:                                  #taking actions in case it wasn't found
         print(word, "is wrong")
 
         replace= difflib.get_close_matches(word,dict,3)         #genrates a 3 elemnts list with best mathces
@@ -51,7 +48,13 @@ for word in words:                                  #loop over phrase words
            words[count]=replace[choice-1]
     count+=1
 
-
-
 for word in words:                                              #print out the new phrase
     print(word, end=" ")
+
+
+
+# import bisect
+# >> a = [1, 2, 4, 5]
+# >> bisect.insort(a, 3)
+# >> print(a)
+# [1, 2, 3, 4, 5]
