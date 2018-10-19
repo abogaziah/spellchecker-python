@@ -27,7 +27,8 @@ def find(dict, word):
 
 
 def action(dict, word, words, count):
-    """lets you decide to replace, skip or add the word to dictionary"""
+        """lets you decide to replace, skip or add the word to dictionary"""
+
         replace= difflib.get_close_matches(word,dict,3)         #genrates max of 3 elements list(called replace) with best matches
         choice=0
         while True:
@@ -40,14 +41,18 @@ def action(dict, word, words, count):
                     print(i+1, replace[i])
                 print(len(replace)+1, "skip")
                 print(len(replace)+2, "add it to dictionary")
+                print(len(replace) + 3, "other (you'll type it)")
                 choice=int(input())
 
-                if choice>0 and choice<6  :                     #won't exit the loop untill getting correct choice
+                if choice>0 and choice<7  :                     #won't exit the loop untill getting correct choice
                     break
-        if choice== len(replace)+2:
-            p_dic(words[count-1])                               #if user chooses to add the word. call p_dic
+        if choice== len(replace)+3:
+            words[count - 1]=input("type it")
+        elif choice== len(replace)+2:
+            p_dic(words[count-1])                               #if user chooses to add the word. call p_dic()
         elif choice!=len(replace)+1 and choice!=0:
             words[count-1]=replace[choice-1]                    #if user chooses a correction, update the string
+
 
 def p_dic(nw):
     """"adds a word to the personal dictionary file(p_dic.txt) """
@@ -64,15 +69,26 @@ def p_dic(nw):
 def main():
     dict=read_dict("Dic.txt")
     p_dict=read_dict("p_dic.txt")
-    phrase = input("type a phrase")
+
+    phrase = input("type a phrase")                             #takes input, saves it to list or strings
     words = phrase.split()
-    count=0
+    count=0                                                     #words counter
+
     for word in words:                                          #itrates over words in the phrase, and checks them
         count+=1
-        word=word.lower()
+        word=word.lower()                                       #lowecase the words so they have same ASCII as the dic
+
+        if word[-1]=="."or word[-1]==",":                       #skips punctuation
+            word= word[:-1]
+        if word[-3:]=="n't" or word[-3:]=="'ve" or word[-3:]=="'re":
+            word=word[:-3]
+        if word[-2:]=="'s" or word[-2:]=="'d":
+            word=word[:-2]
+
         if find(dict, word)==False and find(p_dict, word)==False:
-            print(word, "is wrong")
+            print(word, "is wrong")                             # if the word isn't found netiher in dict nor p.dict, call action
             action(dict, word, words, count)
+    print("paragraph is", count, "words")
     for word in words:                                          #prints out the correct phrase
         print(word, end=" ")
 if __name__ == '__main__':
