@@ -70,7 +70,7 @@ def main():
     dict=read_dict("Dic.txt")
     p_dict=read_dict("p_dic.txt")
 
-    phrase = input("type a phrase")                             #takes input, saves it to list or strings
+    phrase = input("put your text here")                        #takes input, saves it to list or strings
     words = phrase.split()
     count=0                                                     #words counter
 
@@ -78,12 +78,14 @@ def main():
         count+=1
         word=word.lower()                                       #lowecase the words so they have same ASCII as the dic
 
-        if word[-1]=="."or word[-1]==",":                       #skips punctuation
+        if word[-1]=="."or word[-1]==","or word[-1]=='"'or word[-1]==')'or word[-1]==":":             #skips punctuation
             word= word[:-1]
         if word[-3:]=="n't" or word[-3:]=="'ve" or word[-3:]=="'re":
             word=word[:-3]
         if word[-2:]=="'s" or word[-2:]=="'d":
             word=word[:-2]
+        if word[0]=='('or word[0]=='"':
+            word=word[1:]
 
         if find(dict, word)==False and find(p_dict, word)==False:
             print(word, "is wrong")                             # if the word isn't found netiher in dict nor p.dict, call action
