@@ -1,5 +1,34 @@
-import difflib
-import bisect
+from difflib import SequenceMatcher
+
+def matches(word, possibilities, n=3, cutoff=0.6):
+    result = []
+    s = SequenceMatcher()
+    s.set_seq2(word)
+    for x in possibilities:
+        s.set_seq1(x)
+        if s.real_quick_ratio() >= cutoff and \
+                s.quick_ratio() >= cutoff and \
+                s.ratio() >= cutoff:
+            result.append((s.ratio(), x))
+
+    # Move the best scorers to head of list
+    result.sort(key=lambda x: x[0], reverse=True)
+    if len(result)>n:
+        result=result[0:n]
+    # Strip scores for the best n matches
+    return [x for score, x in result]
+
+def insort(a, x):
+    hi = len(a)
+    lo = 0
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if x < a[mid]:
+            hi = mid
+        else:
+            lo = mid + 1
+    a.insert(lo, x)
+
 
 def read_dict(dict_name):
     """"reads words from txt file into list"""
@@ -19,6 +48,8 @@ def find(dict, word):
         if dict[mid]==word:
             return True
         elif dict[mid]<word:
+
+
             l=mid+1
         else:
             r=mid-1
@@ -29,7 +60,7 @@ def find(dict, word):
 def action(dict, word, words, count):
         """lets you decide to replace, skip or add the word to dictionary"""
 
-        replace= difflib.get_close_matches(word,dict,3)         #genrates max of 3 elements list(called replace) with best matches
+        replace= matches(word,dict)         #genrates max of 3 elements list(called replace) with best matches
         choice=0
         while True:
             if len(replace)<1:                                  #the list replace is empty, no close matches found
@@ -41,10 +72,10 @@ def action(dict, word, words, count):
                     print(i+1, replace[i])
                 print(len(replace)+1, "skip")
                 print(len(replace)+2, "add it to dictionary")
-                print(len(replace) + 3, "other (you'll type it)")
+                print(len(replace)+3, "other (you'll type it)")
                 choice=int(input())
 
-                if choice>0 and choice<7  :                     #won't exit the loop untill getting correct choice
+                if choice>0 and choice<len(replace)+4:                     #won't exit the loop untill getting correct choice
                     break
         if choice== len(replace)+3:
             words[count - 1]=input("type it")
@@ -59,33 +90,38 @@ def p_dic(nw):
     print(nw, "is added")
     dict=read_dict("p_dic.txt")                                 #loads the personal dictionary into a list
 
-    bisect.insort(dict, nw)                                     #inserts the word in its correct place, to keep it sorted
+    insort(dict, nw)                                     #inserts the word in its correct place, to keep it sorted
 
     f= open("p_dic.txt","w")
     for word in dict:                                           #writes the list back to the txt file
         f.write("%s\n" % word)
     f.close
 
+
+def skip_punc(word):
+    if word[-1] == "." or word[-1] == "," or word[-1] == '"' or word[-1] == ')' or word[-1] == ":":  # skips punctuation
+        word = word[:-1]
+    if word[-3:] == "n't" or word[-3:] == "'ve" or word[-3:] == "'re":
+        word = word[:-3]
+    if word[-2:] == "'s" or word[-2:] == "'d":
+        word = word[:-2]
+    if word[0] == '(' or word[0] == '"':
+        word = word[1:]
+    return word
+
+
+
 def main():
     dict=read_dict("Dic.txt")
     p_dict=read_dict("p_dic.txt")
-
-    phrase = input("put your text here")                        #takes input, saves it to list or strings
+    phrase = input("put your text here ")                        #takes input, saves it to list or strings
     words = phrase.split()
-    count=0                                                     #words counter
 
+    count=0                                                     #words counter
     for word in words:                                          #itrates over words in the phrase, and checks them
         count+=1
-        word=word.lower()                                       #lowecase the words so they have same ASCII as the dic
-
-        if word[-1]=="."or word[-1]==","or word[-1]=='"'or word[-1]==')'or word[-1]==":":             #skips punctuation
-            word= word[:-1]
-        if word[-3:]=="n't" or word[-3:]=="'ve" or word[-3:]=="'re":
-            word=word[:-3]
-        if word[-2:]=="'s" or word[-2:]=="'d":
-            word=word[:-2]
-        if word[0]=='('or word[0]=='"':
-            word=word[1:]
+        word=word.lower()                                       #lowecase the words so they have same ASCII as the dict
+        word=skip_punc(word)
 
         if find(dict, word)==False and find(p_dict, word)==False:
             print(word, "is wrong")                             # if the word isn't found netiher in dict nor p.dict, call action
